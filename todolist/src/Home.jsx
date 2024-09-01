@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from "react";
-import Create from "./Create";
 import axios from "axios";
-import { BsCircle, BsCircleFill, BsFillCheckCircleFill } from "react-icons/bs";
-import { BsFillTrashFill } from "react-icons/bs";
+import {
+  BsCircle,
+  BsFillCheckCircleFill,
+  BsFillTrashFill,
+  BsPencilSquare,
+  BsPlusCircle,
+} from "react-icons/bs";
 
 function Home() {
   const [todos, setTodos] = useState([]);
+  const [editId, setEditId] = useState(null); // Track which todo is being edited
+  const [editText, setEditText] = useState(""); // Track the new text for the todo
+  const [newTask, setNewTask] = useState(""); // Track the new task to be created
 
   useEffect(() => {
     axios
@@ -14,26 +21,95 @@ function Home() {
       .catch((err) => console.log(err));
   }, []);
 
-  const handleEdit = (id) => {
+  const handleDoneToggle = (id, done) => {
     axios
-      .put("http://localhost:3001/update/" + id)
-      .then((result) => console.log(result))
+      .put(`http://localhost:3001/update/${id}`, { done: !done })
+      .then((result) => {
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) =>
+            todo._id === id ? { ...todo, done: !done } : todo
+          )
+        );
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleEdit = (id, task) => {
+    setEditId(id);
+    setEditText(task);
+  };
+
+  const handleUpdate = () => {
+    axios
+      .patch(`http://localhost:3001/update/${editId}`, { task: editText })
+      .then((result) => {
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) =>
+            todo._id === editId ? { ...todo, task: editText } : todo
+          )
+        );
+        setEditId(null);
+        setEditText("");
+      })
       .catch((err) => console.log(err));
   };
 
   const handleDelete = (id) => {
     axios
-      .delete("http://localhost:3001/delete/" + id)
+      .delete(`http://localhost:3001/delete/${id}`)
       .then((result) => {
-        location.reload();
+        setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
       })
       .catch((err) => console.log(err));
   };
 
+  const handleCreate = () => {
+    axios
+      .post("http://localhost:3001/add", { task: newTask })
+      .then((result) => {
+        setTodos((prevTodos) => [...prevTodos, result.data]);
+        setNewTask(""); // Clear input field
+      })
+      .catch((err) => console.log(err));
+  };
+
+  // Function to get the color based on the task status
+  const getTaskColor = (done) => {
+    return done ? "#a3e4d7" : "#edbb99";
+  };
+
   return (
-    <div className="home">
+    <div style={{ padding: "20px", textAlign: "center" }}>
       <h2>Smash your Goals Today!</h2>
-      <Create />
+
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          placeholder="Add a new task"
+          style={{
+            marginRight: "10px",
+            padding: "5px",
+            borderRadius: "4px",
+            border: "1px solid #ddd",
+            width: "300px",
+          }}
+        />
+        <button
+          onClick={handleCreate}
+          style={{
+            padding: "5px 10px",
+            borderRadius: "4px",
+            border: "none",
+            backgroundColor: "#4CAF50",
+            color: "#2c3e50",
+          }}
+        >
+          <BsPlusCircle style={{ fontSize: "20px", verticalAlign: "middle" }} />{" "}
+          Add
+        </button>
+      </div>
 
       {todos.length === 0 ? (
         <div>
@@ -41,26 +117,126 @@ function Home() {
         </div>
       ) : (
         todos.map((todo) => (
-          <div className="task" key={todo._id}>
-            {" "}
-            {/**added a key prop here **/}
-            <div className="checkbox" onClick={() => handleEdit(todo._id)}>
-              {todo.done ? (
-                <BsFillCheckCircleFill className="icon"></BsFillCheckCircleFill>
-              ) : (
-                <BsCircle className="icon" />
-              )}
-
-              <p className={todo.done ? "line_through" : ""}>{todo.task}</p>
-            </div>
-            <div>
-              <span>
+          <div
+            key={todo._id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: "10px",
+              padding: "10px",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              width: "400px",
+              margin: "0 auto",
+              marginTop: "5px",
+              color: "#2c3e50",
+              backgroundColor: getTaskColor(todo.done), // Apply task-specific color
+            }}
+          >
+            {editId === todo._id ? (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <input
+                  type="text"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  style={{
+                    marginRight: "10px",
+                    padding: "5px",
+                    borderRadius: "4px",
+                    border: "1px solid #ddd",
+                  }}
+                />
+                <button
+                  onClick={handleUpdate}
+                  style={{
+                    marginRight: "10px",
+                    padding: "5px 10px",
+                    borderRadius: "4px",
+                    border: "none",
+                    backgroundColor: "#4CAF50",
+                    color: "white",
+                  }}
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => setEditId(null)}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: "4px",
+                    border: "none",
+                    backgroundColor: "#f44336",
+                    color: "white",
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexGrow: 1,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleDoneToggle(todo._id, todo.done)}
+                >
+                  {todo.done ? (
+                    <BsFillCheckCircleFill
+                      style={{ marginRight: "10px", fontSize: "20px" }}
+                    />
+                  ) : (
+                    <BsCircle
+                      style={{ marginRight: "10px", fontSize: "20px" }}
+                    />
+                  )}
+                  <p
+                    style={{
+                      textDecoration: todo.done ? "line-through" : "none",
+                      color: "#2c3e50", // Ensures text is readable against background
+                    }}
+                  >
+                    {todo.task}
+                  </p>
+                </div>
+                <BsPencilSquare
+                  style={{
+                    marginLeft: "10px",
+                    fontSize: "20px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleEdit(todo._id, todo.task)}
+                />
                 <BsFillTrashFill
-                  className="icon"
+                  style={{
+                    marginLeft: "10px",
+                    fontSize: "20px",
+                    cursor: "pointer",
+                  }}
                   onClick={() => handleDelete(todo._id)}
                 />
-              </span>
-            </div>
+                <span
+                  style={{
+                    marginLeft: "10px",
+                    fontSize: "16px",
+                    color: todo.done ? "green" : "yellow",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {todo.done ? "Task Completed" : "In Progress"}
+                </span>
+              </div>
+            )}
           </div>
         ))
       )}
