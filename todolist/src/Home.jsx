@@ -16,14 +16,14 @@ function Home() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3001/get")
+      .get("https://my-todolist-app.onrender.com/get")
       .then((result) => setTodos(result.data))
       .catch((err) => console.log(err));
   }, []);
 
   const handleDoneToggle = (id, done) => {
     axios
-      .put(`http://localhost:3001/update/${id}`, { done: !done })
+      .put(`https://my-todolist-app.onrender.com/update/${id}`, { done: !done })
       .then((result) => {
         setTodos((prevTodos) =>
           prevTodos.map((todo) =>
@@ -41,7 +41,7 @@ function Home() {
 
   const handleUpdate = () => {
     axios
-      .patch(`http://localhost:3001/update/${editId}`, { task: editText })
+      .patch(`https://my-todolist-app.onrender.com/update/${editId}`, { task: editText })
       .then((result) => {
         setTodos((prevTodos) =>
           prevTodos.map((todo) =>
@@ -56,7 +56,7 @@ function Home() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:3001/delete/${id}`)
+      .delete(`https://my-todolist-app.onrender.com/delete/${id}`)
       .then((result) => {
         setTodos((prevTodos) => prevTodos.filter((todo) => todo._id !== id));
       })
@@ -65,7 +65,7 @@ function Home() {
 
   const handleCreate = () => {
     axios
-      .post("http://localhost:3001/add", { task: newTask })
+      .post("https://my-todolist-app.onrender.com/add", { task: newTask })
       .then((result) => {
         setTodos((prevTodos) => [...prevTodos, result.data]);
         setNewTask(""); // Clear input field
