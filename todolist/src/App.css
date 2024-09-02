@@ -5,7 +5,8 @@
 }
 
 .create_form_input {
-  width: 300px;
+  width: 100%;
+  /* max-width: 300px; */
   padding: 10px;
   border-bottom: 2px solid;
   outline: none;
@@ -21,7 +22,8 @@
 .task {
   display: flex;
   align-items: center;
-  width: 345px;
+  width: 100%;
+  max-width: 345px;
   justify-content: space-between;
   background-color: black;
   color: white;

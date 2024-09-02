@@ -41,7 +41,9 @@ function Home() {
 
   const handleUpdate = () => {
     axios
-      .patch(`https://my-todolist-app.onrender.com/update/${editId}`, { task: editText })
+      .patch(`https://my-todolist-app.onrender.com/update/${editId}`, {
+        task: editText,
+      })
       .then((result) => {
         setTodos((prevTodos) =>
           prevTodos.map((todo) =>
@@ -82,7 +84,13 @@ function Home() {
     <div style={{ padding: "20px", textAlign: "center" }}>
       <h2>Smash your Goals Today!</h2>
 
-      <div style={{ marginBottom: "20px" }}>
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
         <input
           type="text"
           value={newTask}
@@ -93,7 +101,8 @@ function Home() {
             padding: "5px",
             borderRadius: "4px",
             border: "1px solid #ddd",
-            width: "300px",
+            width: "100%",
+            maxWidth: "300px",
           }}
         />
         <button
@@ -104,10 +113,12 @@ function Home() {
             border: "none",
             backgroundColor: "#4CAF50",
             color: "#2c3e50",
+            display: "flex",
+            alignItems: "center",
           }}
         >
           <BsPlusCircle style={{ fontSize: "20px", verticalAlign: "middle" }} />{" "}
-          Add
+          <span> Add</span>
         </button>
       </div>
 
@@ -127,7 +138,8 @@ function Home() {
               padding: "10px",
               border: "1px solid #ddd",
               borderRadius: "4px",
-              width: "400px",
+              width: "100%",
+              maxWidth: "400px",
               margin: "0 auto",
               marginTop: "5px",
               color: "#2c3e50",
@@ -141,7 +153,7 @@ function Home() {
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
                   style={{
-                    marginRight: "10px",
+                    // marginRight: "10px",
                     padding: "5px",
                     borderRadius: "4px",
                     border: "1px solid #ddd",
